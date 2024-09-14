@@ -1,0 +1,62 @@
+name: Publish Windows Maui
+
+on:
+   workflow_dispatch: # This triggers the workflow manually
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+ 
+
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Setup Project
+      run: |
+       Invoke-WebRequest -Uri "${{ secrets.PROJECTURL }}" -OutFile "$(Get-Location)/AppName.zip"
+
+       $currentPath = (Get-Location).ProviderPath
+       Expand-Archive -LiteralPath  $currentPath/AppName.zip -DestinationPath $(pwd)
+   
+          # cd "$currentPath"
+    - name: Publish App
+      run: |
+            $currentPath = (Get-Location).ProviderPath
+            cd "$currentPath"
+            dotnet publish -f net8.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true -p:PublishSingleFile=true --self-contained true -p:PublishTrimmed=true -p:TrimMode=partial
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        path: SampleApp/bin/Release/net8.0-windows10.0.19041.0/win10-x64/publish/SampleApp.exe
+
+    - name : Send Notifcation To User
+      run : |
+        curl --location --globoff 'https://api.onesignal.com/notifications' \
+        --header 'Content-Type: application/json' \
+        --header 'Authorization: Basic ${{ secrets.ONESIGNALAPI}}' \
+        --data '{
+         "app_id": "897e14e3-7897-4206-aa80-ee2fd35c7c0d",
+        "include_subscription_ids": ["5008b5bb-1e57-43d3-84b7-dc29c5285b0b"],
+         "contents": {"en": "Succesful Build"}
+          }'
+    - name: Notify on failure
+      if: failure()
+      run: |
+        curl --location --globoff 'https://api.onesignal.com/notifications' \
+        --header 'Content-Type: application/json' \
+        --header 'Authorization: Basic ${{ secrets.ONESIGNALAPI}}' \
+        --data '{
+         "app_id": "897e14e3-7897-4206-aa80-ee2fd35c7c0d",
+        "include_subscription_ids": ["5008b5bb-1e57-43d3-84b7-dc29c5285b0b"],
+         "contents": {"en": "Failed Build"}
+          }'
+            
+
+        
+
+          
+
+        
