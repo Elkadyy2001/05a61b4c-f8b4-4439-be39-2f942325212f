@@ -34,9 +34,9 @@ jobs:
 
     - name : Send Notifcation To User
       run : |
-        curl --location --globoff 'https://api.onesignal.com/notifications' \
-        --header 'Content-Type: application/json' \
-        --header 'Authorization: Basic ${{ secrets.ONESIGNALAPI}}' \
+        curl --location --globoff 'https://api.onesignal.com/notifications' `
+        --header 'Content-Type: application/json'
+        --header "Authorization: Basic $($env:ONESIGNALAPI)" `
         --data '{
          "app_id": "897e14e3-7897-4206-aa80-ee2fd35c7c0d",
         "include_subscription_ids": ["5008b5bb-1e57-43d3-84b7-dc29c5285b0b"],
@@ -45,9 +45,9 @@ jobs:
     - name: Notify on failure
       if: failure()
       run: |
-        curl --location --globoff 'https://api.onesignal.com/notifications' \
-        --header 'Content-Type: application/json' \
-        --header 'Authorization: Basic ${{ secrets.ONESIGNALAPI}}' \
+        curl --location --globoff 'https://api.onesignal.com/notifications' `
+        --header 'Content-Type: application/json' `
+        --header "Authorization: Basic $($env:ONESIGNALAPI)" `
         --data '{
          "app_id": "897e14e3-7897-4206-aa80-ee2fd35c7c0d",
         "include_subscription_ids": ["5008b5bb-1e57-43d3-84b7-dc29c5285b0b"],
