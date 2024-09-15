@@ -40,7 +40,7 @@ jobs:
         --data '{
          "app_id": "897e14e3-7897-4206-aa80-ee2fd35c7c0d",
         "include_subscription_ids": ["5008b5bb-1e57-43d3-84b7-dc29c5285b0b"],
-         "contents": {"en": "Failed Build"}
+         "contents": {"en": "Completed Build"}
           }'
             
             
